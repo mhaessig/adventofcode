@@ -127,7 +127,7 @@ fn solution(input: String) -> Result<(u64, u64), Box<dyn Error>> {
     let part2 = updates
         .iter()
         .filter(|&update| !update.is_sorted())
-        .map(|mut update| {
+        .map(|update| {
             let mut sorted = update.clone();
             sorted.sort();
             sorted[sorted.len() / 2].number as u64
