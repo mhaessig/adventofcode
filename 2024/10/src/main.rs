@@ -9,35 +9,6 @@ use std::{
 type TopoMap = Vec<Vec<u8>>;
 type Coord = (usize, usize);
 
-/// Recursive DFS starting from a trailhead.
-fn walk_trail(coord: Coord, seen: &mut HashSet<Coord>, map: &TopoMap) {
-    seen.insert(coord);
-    let (x, y) = coord;
-    let altitude = map[y][x];
-
-    if altitude == 9 {
-        return;
-    }
-
-    for xn in x.saturating_sub(1)..=usize::min(x + 1, map[0].len() - 1) {
-        for yn in y.saturating_sub(1)..=usize::min(y + 1, map.len() - 1) {
-            // No diagonals!
-            if xn != x && yn != y {
-                continue;
-            }
-
-            let c = (xn, yn);
-            if seen.contains(&c) {
-                continue;
-            }
-
-            if map[yn][xn] == altitude + 1 {
-                walk_trail(c, seen, map);
-            }
-        }
-    }
-}
-
 fn find_trails(coord: Coord, map: &TopoMap) -> Vec<Vec<Coord>> {
     let (x, y) = coord;
     let altitude = map[y][x];
@@ -94,11 +65,14 @@ fn solution(r: BufReader<File>) -> Result<(u64, u64), Box<dyn Error>> {
     let part1 = trailheads
         .iter()
         .map(|th| {
-            let mut seen = HashSet::new();
-            walk_trail(*th, &mut seen, &grid);
-            seen.intersection(&tops).count() as u64
+            find_trails(*th, &grid)
+                .iter()
+                .map(|trail| trail[0])
+                .collect::<HashSet<Coord>>()
         })
-        .sum();
+        .flatten()
+        .count()
+        .try_into()?;
     let part2 = trailheads
         .iter()
         .map(|th| find_trails(*th, &grid).len() as u64)
