@@ -1,11 +1,13 @@
 use std::{
+    collections::HashMap,
     error::Error,
     fs::File,
+    hash::Hash,
     io::{BufRead, BufReader},
     str::FromStr,
 };
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 struct Stone(u64);
 
 #[derive(Debug, PartialEq, Eq)]
@@ -42,13 +44,28 @@ impl Stone {
         }
     }
 
-    fn blink_n(&self, n: u8) -> u64 {
+    fn blink_n(&self, n: u8, cache: &mut Cache) -> u64 {
         if n == 0 {
             return 1;
         }
+
+        if let Some(res) = cache.get(&(*self, n)) {
+            return *res;
+        }
+
         match self.blink() {
-            BlinkedStone::Single(st) => st.blink_n(n - 1),
-            BlinkedStone::Double(left, right) => left.blink_n(n - 1) + right.blink_n(n - 1),
+            BlinkedStone::Single(st) => {
+                let res = st.blink_n(n - 1, cache);
+                cache.insert((st, n-1), res);
+                res
+            }
+            BlinkedStone::Double(left, right) => {
+                let res_l = left.blink_n(n - 1, cache);
+                let res_r = right.blink_n(n - 1, cache);
+                cache.insert((left, n-1), res_l);
+                cache.insert((right, n-1), res_r);
+                res_l + res_r
+            }
         }
     }
 }
@@ -67,6 +84,8 @@ impl FromStr for Stone {
     }
 }
 
+type Cache = HashMap<(Stone, u8), u64>;
+
 fn solution(r: BufReader<File>) -> Result<(u64, u64), Box<dyn Error>> {
     let stones = r
         .lines()
@@ -76,8 +95,10 @@ fn solution(r: BufReader<File>) -> Result<(u64, u64), Box<dyn Error>> {
         .map(|s| Stone::from_str(s).unwrap())
         .collect::<Vec<Stone>>();
 
-    let part1 = stones.iter().map(|s| s.blink_n(25)).sum();
-    let part2 = 0;
+    let mut cache: Cache = HashMap::new();
+    let part1 = stones.iter().map(|s| s.blink_n(25, &mut cache)).sum();
+    let part2 = stones.iter().map(|s| s.blink_n(75, &mut cache)).sum();
+    //let part2 = 0;
 
     Ok((part1, part2))
 }
