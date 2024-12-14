@@ -1,5 +1,5 @@
 use std::{
-    collections::{HashMap, HashSet},
+    collections::HashSet,
     error::Error,
     fs::File,
     hash::Hash,
@@ -184,10 +184,9 @@ fn solution(r: BufReader<File>) -> Result<(u64, u64), Box<dyn Error>> {
         .try_into()?;
 
     let mut loop_obss = HashSet::<Position>::new();
-    for (i, additional_obs) in guard_history[1..guard_history.len() - 1]
+    for additional_obs in guard_history[1..guard_history.len() - 1]
         .iter()
         .filter(|pos| area.pos_is_inside(pos))
-        .enumerate()
     {
         let mod_area = area.with_additional_obstacle(*additional_obs);
         let mut guard = start_guard;

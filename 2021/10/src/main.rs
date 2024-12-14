@@ -47,7 +47,7 @@ fn main() {
         .iter()
         .map(|e| {
             if let Error::Incomplete(stack) = e {
-                stack.into_iter().rev().fold(0u128, |score, c| {
+                stack.iter().rev().fold(0u128, |score, c| {
                     score * 5
                         + match c {
                             ')' => 1,

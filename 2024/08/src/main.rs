@@ -44,11 +44,10 @@ impl Add for Point {
     }
 }
 
-fn all_pairs<T>(v: &Vec<T>) -> impl Iterator<Item = (&T, &T)> {
+fn all_pairs<T>(v: &[T]) -> impl Iterator<Item = (&T, &T)> {
     v.iter()
         .enumerate()
-        .map(|(i, elem)| v[i + 1..].iter().map(move |other| (elem, other)))
-        .flatten()
+        .flat_map(|(i, elem)| v[i + 1..].iter().map(move |other| (elem, other)))
 }
 
 fn solution(r: BufReader<File>) -> Result<(u64, u64), Box<dyn Error>> {

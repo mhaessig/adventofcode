@@ -8,7 +8,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let f = File::open("input.txt")?;
     let r = BufReader::new(f);
 
-    let datastream = r.lines().nth(0).unwrap().unwrap();
+    let datastream = r.lines().next().unwrap().unwrap();
 
     find_start_marker(&datastream, 4);
     find_start_marker(&datastream, 14);

@@ -64,13 +64,12 @@ fn solution(r: BufReader<File>) -> Result<(u64, u64), Box<dyn Error>> {
 
     let part1 = trailheads
         .iter()
-        .map(|th| {
+        .flat_map(|th| {
             find_trails(*th, &grid)
                 .iter()
                 .map(|trail| trail[0])
                 .collect::<HashSet<Coord>>()
         })
-        .flatten()
         .count()
         .try_into()?;
     let part2 = trailheads

@@ -5,6 +5,7 @@ use std::{
 };
 
 #[derive(Clone, Debug)]
+#[allow(dead_code)]
 enum Fs {
     File { name: String, size: u64 },
     Dir { name: String, children: Vec<Self> },
@@ -43,7 +44,7 @@ fn count_below_size((size, count): (u64, u64), dir: Fs, max_size: u64) -> (u64, 
     let dir_size = dir.size();
     match dir {
         Fs::Dir { name: _, children } => children.into_iter().fold(
-            if (dir_size < max_size) {
+            if dir_size < max_size {
                 (dir_size + size, count + 1)
             } else {
                 (size, count)
@@ -62,7 +63,8 @@ fn dir_to_delete(size: u64, dir: Fs, min_size: u64) -> u64 {
                 dir_size
             } else {
                 size
-            }, |to_delete, fs| dir_to_delete(to_delete, fs, min_size)
+            },
+            |to_delete, fs| dir_to_delete(to_delete, fs, min_size),
         ),
         _ => size,
     }
@@ -73,7 +75,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     let r = BufReader::new(f);
 
     let mut lines = r.lines();
-    let Some(Ok(line)) = lines.next() else { unreachable!();};
+    let Some(Ok(line)) = lines.next() else {
+        unreachable!();
+    };
     let fs = match line.split(" ").collect::<Vec<_>>()[..] {
         ["$", "cd", name] => parse_dir(&mut lines, name.to_string()),
         _ => unreachable!(),

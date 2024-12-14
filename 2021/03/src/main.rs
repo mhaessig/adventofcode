@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 #[derive(Debug, Clone, Copy)]
 struct Bitcount {
     zeros: usize,
@@ -21,8 +23,20 @@ enum RatingType {
 impl RatingType {
     fn get_bit_to_keep(self, bitcount: &Bitcount) -> u32 {
         match self {
-            Self::OxygenGenerator => if bitcount.zeros <= bitcount.ones {1} else {0},
-            Self::CO2Scrubber => if bitcount.zeros <= bitcount.ones {0} else {1}
+            Self::OxygenGenerator => {
+                if bitcount.zeros <= bitcount.ones {
+                    1
+                } else {
+                    0
+                }
+            }
+            Self::CO2Scrubber => {
+                if bitcount.zeros <= bitcount.ones {
+                    0
+                } else {
+                    1
+                }
+            }
         }
     }
 }
@@ -45,12 +59,10 @@ fn main() {
         .rev()
         .enumerate()
         .fold(0, |gamma, (exp, bitcount)| {
-            if bitcount.zeros > bitcount.ones {
-                gamma
-            } else if bitcount.zeros < bitcount.ones {
-                gamma + 2usize.pow(exp.try_into().unwrap())
-            } else {
-                panic!("equal bitcount")
+            match bitcount.zeros.cmp(&bitcount.ones) {
+                Ordering::Less => gamma,
+                Ordering::Greater => gamma + 2usize.pow(exp.try_into().unwrap()),
+                Ordering::Equal => panic!("equal bitcount"),
             }
         });
 
@@ -59,12 +71,10 @@ fn main() {
         .rev()
         .enumerate()
         .fold(0, |gamma, (exp, bitcount)| {
-            if bitcount.zeros < bitcount.ones {
-                gamma
-            } else if bitcount.zeros > bitcount.ones {
-                gamma + 2usize.pow(exp.try_into().unwrap())
-            } else {
-                panic!("equal bitcount")
+            match bitcount.zeros.cmp(&bitcount.ones) {
+                Ordering::Less => gamma,
+                Ordering::Greater => gamma + 2usize.pow(exp.try_into().unwrap()),
+                Ordering::Equal => panic!("equal bitcount"),
             }
         });
 
@@ -77,41 +87,37 @@ fn main() {
 
     dbg!(co2_rating);
     dbg!(life_support_rating);
-
 }
 
-fn find_rating(bits: &Vec<Vec<u32>>, count: &Vec<Bitcount>, rating_type: RatingType) -> u32 {
-    let mut numbers = bits.clone();
-    let mut bitcount = count.clone().to_owned();
+fn find_rating(bits: &[Vec<u32>], count: &[Bitcount], rating_type: RatingType) -> u32 {
+    let mut numbers = bits.to_owned();
+    let mut bitcount = count.to_owned();
     let mut bit_idx: usize = 0;
     while numbers.len() != 1 {
         let bitcount_at_idx = &bitcount[bit_idx].to_owned();
-        let keep_bit_at_idx = rating_type.get_bit_to_keep(&bitcount_at_idx);
+        let keep_bit_at_idx = rating_type.get_bit_to_keep(bitcount_at_idx);
 
-        
-        numbers = numbers
-            .into_iter()
-            .filter(|num| num[bit_idx] == keep_bit_at_idx)
-            .collect();
+        numbers.retain(|num| num[bit_idx] == keep_bit_at_idx);
 
         bitcount = get_bitcount(&numbers);
 
         bit_idx += 1;
     }
 
-    let number = numbers
-        .into_iter()
-        .flatten()
-        .collect::<Vec<u32>>();
+    let number = numbers.into_iter().flatten().collect::<Vec<u32>>();
 
     dbg!(&number);
-    
-    number.into_iter().rev().enumerate().fold(0u32, |n, (exp, bit)| {
+
+    number
+        .into_iter()
+        .rev()
+        .enumerate()
+        .fold(0u32, |n, (exp, bit)| {
             n + bit * 2u32.pow(exp.try_into().unwrap())
         })
 }
 
-fn get_bitcount(bits: &Vec<Vec<u32>>) -> Vec<Bitcount> {
+fn get_bitcount(bits: &[Vec<u32>]) -> Vec<Bitcount> {
     let mut count = Vec::<Bitcount>::new();
     for (i, n) in bits.iter().enumerate() {
         for (j, bit) in n.iter().enumerate() {

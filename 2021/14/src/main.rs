@@ -15,7 +15,7 @@ fn main() {
     let mut empty_line_found = false;
     for l in lines {
         if !empty_line_found {
-            if l == "" {
+            if l.is_empty() {
                 empty_line_found = true;
                 continue;
             }

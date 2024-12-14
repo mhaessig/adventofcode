@@ -41,7 +41,7 @@ impl Line {
                 }
             }
         } else {
-            let mut idx = self.start.clone();
+            let mut idx = self.start;
             while idx != self.end {
                 points.push(idx);
                 idx = Point {
@@ -100,7 +100,7 @@ fn main() {
     }
 
     let count = plane.iter().fold(0, |count, row| {
-        count + row.into_iter().filter(|&&n| n >= 2).count()
+        count + row.iter().filter(|&&n| n >= 2).count()
     });
 
     dbg!(count);

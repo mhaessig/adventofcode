@@ -8,7 +8,7 @@ fn main() {
 
     let mut counter: i128 = 0;
     let mut counters: Vec<i128> = vec!(0,0,0,0);
-    let steps = vec!(1,3,5,7);
+    let steps = [1,3,5,7];
     let mut width = 0;
     for (i, line) in buf.lines().enumerate() {
         if i == 0 {
@@ -19,14 +19,14 @@ fn main() {
         let l = line.unwrap();
 
         for (j, m) in steps.iter().enumerate() {
-            let n = ((i * m) % width) as usize;
+            let n = (i * m) % width;
             if '#' == l.chars().nth(n).unwrap() {
                 counters[j] += 1;
             }
         }
 
         if i % 2 == 0 {
-            let n = ((i / 2) % width) as usize;
+            let n = (i / 2) % width;
             if '#' == l.chars().nth(n).unwrap() {
                 counter += 1;
             }

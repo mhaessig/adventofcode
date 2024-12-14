@@ -1,4 +1,4 @@
-use std::{borrow::Borrow, collections::HashMap};
+use std::collections::HashMap;
 
 fn sub (s1: &str, s2: &str) -> String {
     let mut s = String::from(s1);
@@ -64,7 +64,7 @@ fn main() {
         let bot_right = rest
             .iter()
             .filter(|&&&s| s.len() == 6)
-            .map(|&&s| sub(&sub(&sub(&s, &bot_left_bot), &top_left_mid), &top))
+            .map(|&&s| sub(&sub(&sub(s, &bot_left_bot), &top_left_mid), &top))
             .filter(|s| s.len() == 1)
             .collect::<Vec<_>>()[0].clone();
         let top_right = sub(one, &bot_right);
@@ -72,27 +72,25 @@ fn main() {
         let mut number_map = HashMap::<String, usize>::new();
 
         number_map.insert(
-            to_sorted_str(&vec![top_right.clone(), bot_right.clone(), top.clone(), bot.clone(), top_left.clone(), bot_left.clone()]),
+            to_sorted_str(&[top_right.clone(), bot_right.clone(), top.clone(), bot.clone(), top_left.clone(), bot_left.clone()]),
             0,
         );
-        number_map.insert(to_sorted_str(&vec![top_right.clone(), bot_right.clone()]), 1);
-        number_map.insert(to_sorted_str(&vec![top.clone(), top_right.clone(), mid.clone(), bot_left.clone(), bot.clone()]), 2);
-        number_map.insert(to_sorted_str(&vec![top_right.clone(), bot_right.clone(), top.clone(), mid.clone(), bot.clone()]), 3);
-        number_map.insert(to_sorted_str(&vec![top_right.clone(), bot_right.clone(), top_left.clone(), mid.clone()]), 4);
-        number_map.insert(to_sorted_str(&vec![top_left.clone(), bot_right.clone(), top.clone(), mid.clone(), bot.clone()]), 5);
+        number_map.insert(to_sorted_str(&[top_right.clone(), bot_right.clone()]), 1);
+        number_map.insert(to_sorted_str(&[top.clone(), top_right.clone(), mid.clone(), bot_left.clone(), bot.clone()]), 2);
+        number_map.insert(to_sorted_str(&[top_right.clone(), bot_right.clone(), top.clone(), mid.clone(), bot.clone()]), 3);
+        number_map.insert(to_sorted_str(&[top_right.clone(), bot_right.clone(), top_left.clone(), mid.clone()]), 4);
+        number_map.insert(to_sorted_str(&[top_left.clone(), bot_right.clone(), top.clone(), mid.clone(), bot.clone()]), 5);
         number_map.insert(
-            to_sorted_str(&vec![top_left.clone(), bot_left.clone(), bot_right.clone(), top.clone(), mid.clone(), bot.clone()]),
+            to_sorted_str(&[top_left.clone(), bot_left.clone(), bot_right.clone(), top.clone(), mid.clone(), bot.clone()]),
             6,
         );
-        number_map.insert(to_sorted_str(&vec![top_right.clone(), bot_right.clone(), top.clone()]), 7);
+        number_map.insert(to_sorted_str(&[top_right.clone(), bot_right.clone(), top.clone()]), 7);
         number_map.insert(
-            to_sorted_str(&vec![
-                top_right.clone(), bot_right.clone(), top_left.clone(), bot_left.clone(), top.clone(), mid.clone(), bot.clone(),
-            ]),
+            to_sorted_str(&[top_right.clone(), bot_right.clone(), top_left.clone(), bot_left.clone(), top.clone(), mid.clone(), bot.clone()]),
             8,
         );
         number_map.insert(
-            to_sorted_str(&vec![top_right.clone(), bot_right.clone(), top_left.clone(), top.clone(), mid.clone(), bot.clone()]),
+            to_sorted_str(&[top_right.clone(), bot_right.clone(), top_left.clone(), top.clone(), mid.clone(), bot.clone()]),
             9,
         );
 
@@ -114,8 +112,8 @@ fn main() {
     dbg!(sum);
 }
 
-fn to_sorted_str<'a>(slc: &Vec<String>) -> String {
-    let mut s = slc.clone();
+fn to_sorted_str(slc: &[String]) -> String {
+    let mut s = slc.to_owned();
     s.sort();
     s.iter().fold(String::new(), |s, c| format!("{}{}", &s, &c))
 }

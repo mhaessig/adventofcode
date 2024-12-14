@@ -79,6 +79,6 @@ fn main() {
 
     sizes.sort();
     sizes.reverse();
-    let prod = sizes[0..3].iter().fold(1, |prod, &size| prod * size);
+    let prod = sizes[0..3].iter().product::<usize>();
     dbg!(prod);
 }

@@ -1,5 +1,4 @@
-use core::num;
-use std::{collections::HashMap, error::Error, usize};
+use std::{collections::HashMap, error::Error};
 
 #[derive(Debug, Default, Clone, Copy)]
 struct BingoField {
@@ -64,7 +63,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let board_strings = &lines[2..];
 
     for i in (5..).step_by(6) {
-        if let None = board_strings.get(i - 1) {
+        if board_strings.get(i - 1).is_none() {
             break;
         }
 
@@ -81,9 +80,9 @@ fn main() -> Result<(), Box<dyn Error>> {
             .collect();
 
         let mut number_coords = HashMap::new();
-        for j in (0..5) {
-            for k in (0..5) {
-                number_coords.insert(board[j][k].number, (j, k));
+        for (j, fields) in board.iter().enumerate().take(5) {
+            for (k, field) in fields.iter().enumerate().take(5) {
+                number_coords.insert(field.number, (j, k));
             }
         }
 

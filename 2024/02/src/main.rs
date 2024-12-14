@@ -1,8 +1,5 @@
 use std::{
-    error::Error,
-    fs::File,
-    io::{BufRead, BufReader},
-    str::FromStr,
+    cmp::Ordering, error::Error, fs::File, io::{BufRead, BufReader}, str::FromStr
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -33,13 +30,15 @@ impl ReactorReport {
             }
 
             match dir {
-                Direction::Unknown => {
-                    if prev < this {
+                Direction::Unknown => match prev.cmp(this) {
+                    Ordering::Less => {
                         dir = Direction::Increasing;
-                    } else if prev > this {
+                    }
+                    Ordering::Greater => {
                         dir = Direction::Decreasing;
                     }
-                }
+                    _ => unreachable!(),
+                },
                 Direction::Decreasing => {
                     if prev < this {
                         return false;

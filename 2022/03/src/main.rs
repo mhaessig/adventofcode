@@ -1,10 +1,9 @@
-#![feature(slice_as_chunks)]
 
 use std::{
     collections::HashSet,
     error::Error,
     fs::File,
-    io::{BufRead, BufReader}, hash::Hash,
+    io::{BufRead, BufReader},
 };
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -34,24 +33,21 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let prio_sum = rucksacks.clone()
         .into_iter()
-        .map(|(c1, c2)| c1.intersection(&c2).nth(0).unwrap().to_owned())
+        .map(|(c1, c2)| c1.intersection(&c2).next().unwrap().to_owned())
         .map(prio_fun)
         .sum::<u32>();
 
     println!("Sum of priorities: {}", prio_sum);
 
     let groups = rucksacks
-        .as_chunks::<3>()
-        .0
-        .into_iter()
+        .chunks(3)
         .map(|a| {
-            let a1 = a[0].0.union(&a[0].1).map(|c| *c).collect::<HashSet<char>>();
-            let a2 = a[1].0.union(&a[1].1).map(|c| *c).collect::<HashSet<char>>();
-            let a3 = a[2].0.union(&a[2].1).map(|c| *c).collect::<HashSet<char>>();
-            let inter = a2.intersection(&a3).map(|c| *c).collect::<HashSet<char>>();
+            let a1 = a[0].0.union(&a[0].1).copied().collect::<HashSet<char>>();
+            let a2 = a[1].0.union(&a[1].1).copied().collect::<HashSet<char>>();
+            let a3 = a[2].0.union(&a[2].1).copied().collect::<HashSet<char>>();
+            let inter = a2.intersection(&a3).copied().collect::<HashSet<char>>();
             a1.clone().intersection(&inter.clone())
-        }
-                .nth(0)
+        }.next()
                 .unwrap()
                 .to_owned()
         )

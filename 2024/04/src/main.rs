@@ -60,8 +60,8 @@ fn solution(r: BufReader<File>) -> Result<(u64, u64), Box<dyn Error>> {
 
     for i in 0..width {
         let mut vert_line = String::with_capacity(height);
-        for j in 0..height {
-            vert_line.push_str(&lines[j][i..=i]);
+        for line in lines.iter().take(height) {
+            vert_line.push_str(&line[i..=i]);
         }
 
         search_strings.push(SearchString::new(

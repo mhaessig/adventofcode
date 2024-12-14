@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use std::{error::Error};
+use std::{cmp::Ordering, error::Error};
 
 enum Change {
     Increase,
@@ -15,12 +15,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     let changes = measurements
         .windows(2)
         .map(|win| {
-            if win[0] < win[1] {
-                Change::Increase
-            } else if win[0] > win[1] {
-                Change::Decrease
-            } else {
-                panic!("Two measurements were equal!");
+            match win[0].cmp(&win[1]) {
+                Ordering::Less => Change::Increase,
+                Ordering::Greater => Change::Decrease,
+                _ => panic!("Two measurements were equal!"),
             }
         })
         .collect_vec();

@@ -3,9 +3,8 @@ extern crate nom;
 
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take_till1, take_while_m_n};
-use nom::character::{is_digit, is_hex_digit};
 use nom::character::complete::{char, multispace1};
-use nom::combinator::{eof, map_res};
+use nom::combinator::eof;
 use nom::sequence::{pair, preceded, terminated};
 
 use thiserror::Error;
@@ -67,11 +66,12 @@ impl FromStr for EyeColor {
             "grn" => Ok(Self::Green),
             "hzl" => Ok(Self::Hazel),
             "oth" => Ok(Self::Other),
-            input => Err(ParseError::EyeColorError)
+            _ => Err(ParseError::EyeColorError)
         }
     }
 }
 
+#[allow(dead_code)]
 #[derive(Debug)]
 struct Passport {
     birth_year: u16,
@@ -90,13 +90,13 @@ impl Passport {
             self.issue_year >= 2010 && self.issue_year <= 2020 &&
             self.expiration_year >= 2020 && self.expiration_year <= 2030 &&
             match self.height {
-                Height::Cm(h) => h >= 150 && h <= 193,
-                Height::In(h) => h >= 59 && h <= 76
+                Height::Cm(h) => (150..=193).contains(&h),
+                Height::In(h) => (59..=76).contains(&h)
             }
     }
 }
 
-fn parse_field<'a, 'b>(input: &'a str, field_name: &'b str) -> nom::IResult<&'a str, &'a str> {
+fn parse_field<'a>(input: &'a str, field_name: &str) -> nom::IResult<&'a str, &'a str> {
     terminated(
         preceded(
             pair(tag(field_name), char(':')),
@@ -106,7 +106,7 @@ fn parse_field<'a, 'b>(input: &'a str, field_name: &'b str) -> nom::IResult<&'a 
     )(input)
 }
 
-fn parse_hcl<'a, 'b>(input: &'a str, field_name: &'b str) -> nom::IResult<&'a str, &'a str> {
+fn parse_hcl<'a>(input: &'a str, field_name: &str) -> nom::IResult<&'a str, &'a str> {
     terminated(
         preceded(
             pair(tag(field_name), char(':')),
@@ -116,11 +116,11 @@ fn parse_hcl<'a, 'b>(input: &'a str, field_name: &'b str) -> nom::IResult<&'a st
     )(input)
 }
 
-fn parse_pid<'a, 'b>(input: &'a str, field_name: &'b str) -> nom::IResult<&'a str, &'a str> {
+fn parse_pid<'a>(input: &'a str, field_name: &str) -> nom::IResult<&'a str, &'a str> {
     terminated(
         preceded(
             pair(tag(field_name), char(':')),
-            take_while_m_n(9, 9, |c: char| c.is_digit(10))
+            take_while_m_n(9, 9, |c: char| c.is_ascii_digit())
         ),
         alt((multispace1, eof))
     )(input)
@@ -163,12 +163,9 @@ fn main() {
     for line in buf.lines() {
         let l = line.unwrap();
 
-        if l.len() == 0 && input.len() > 0 {
+        if l.is_empty() && !input.is_empty() {
             let result= parse_passport(input.as_str());
-            match result {
-                Ok((_, p)) => if p.valid() {valid_counter += 1},
-                Err(_) => ()
-            }
+            if let Ok((_, p)) = result { if p.valid() {valid_counter += 1} }
 
             input.clear();
         } else {

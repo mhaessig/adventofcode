@@ -36,9 +36,9 @@ impl OccuranceMap<u64> {
 
     pub fn get(&self, k: &u64) -> u64 {
         if let Some(val) = self.map.get(k) {
-            return *val;
+            *val
         } else {
-            return 0;
+            0
         }
     }
 }

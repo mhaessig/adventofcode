@@ -23,8 +23,8 @@ impl Calibration {
         assert!(ops.len() == self.vals.len() - 1);
 
         let mut res = self.vals[0];
-        for i in 0..ops.len() {
-            res = match ops[i] {
+        for (i, op) in ops.iter().enumerate() {
+            res = match op {
                 Op::Add => res + self.vals[i + 1],
                 Op::Mul => res * self.vals[i + 1],
                 Op::Cat => format!("{res}{}", self.vals[i + 1]).parse().unwrap(),

@@ -13,18 +13,15 @@ enum Location {
 
 impl Location {
     pub fn is_file(&self) -> bool {
-        match self {
-            Self::File { id: _, size: _ } => true,
-            _ => false,
-        }
+        matches!(self, Self::File { id: _, size: _ })
     }
 }
 
 impl Display for Location {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            &Location::File { id, size: _ } => write!(f, "{id}"),
-            &Location::Free => write!(f, "."),
+        match *self {
+            Location::File { id, size: _ } => write!(f, "{id}"),
+            Location::Free => write!(f, "."),
         }
     }
 }
@@ -42,7 +39,7 @@ struct Free {
 }
 
 fn solution(r: BufReader<fs::File>) -> Result<(u64, u64), Box<dyn Error>> {
-    let line = r.lines().flatten().collect::<String>();
+    let line = r.lines().map_while(Result::ok).collect::<String>();
 
     let mut mem = Vec::<Location>::new();
     let mut files = Vec::<File>::new();
@@ -57,7 +54,7 @@ fn solution(r: BufReader<fs::File>) -> Result<(u64, u64), Box<dyn Error>> {
             }
         } else {
             free_list.push(Free{idx: mem.len(), size: n});
-            for j in 0..n {
+            for _ in 0..n {
                 mem.push(Location::Free);
             }
         }
@@ -100,11 +97,11 @@ fn solution(r: BufReader<fs::File>) -> Result<(u64, u64), Box<dyn Error>> {
                 for i in free.idx..free.idx+f.size {
                     mem_defrag[i] = mem_defrag[f.idx];
                 }
-                free.size = free.size - f.size;
-                free.idx = free.idx + f.size;
+                free.size -= f.size;
+                free.idx += f.size;
 
-                for i in f.idx..f.idx+f.size {
-                    mem_defrag[i] = Location::Free;
+                for loc in mem_defrag.iter_mut().skip(f.idx).take(f.size) {
+                    *loc = Location::Free;
                 }
                 break;
             }

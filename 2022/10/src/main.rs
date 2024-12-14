@@ -69,6 +69,6 @@ fn print_crt(cycle: i32, x: i32) {
     }
 
     if pos == 39 {
-        print!("\n");
+        println!();
     }
 }

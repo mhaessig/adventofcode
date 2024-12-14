@@ -2,8 +2,7 @@ fn main() {
     //let positions: Vec<usize> = include_str!("../example_input.txt")
     let positions: Vec<usize> = include_str!("../input.txt")
         .lines()
-        .map(|s| s.split(',').collect::<Vec<_>>())
-        .flatten()
+        .flat_map(|s| s.split(',').collect::<Vec<_>>())
         .map(|s| s.parse::<usize>().unwrap())
         .collect();
 

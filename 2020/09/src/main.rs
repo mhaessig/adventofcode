@@ -43,7 +43,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             );
             numbers.push(n);
         } else {
-            if !sums.iter().fold(false, |res, sum| res || sum.sum == n) {
+            if !sums.iter().any(|sum| sum.sum == n) {
                 wrong = n;
                 idx = i;
                 break;
@@ -51,10 +51,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             let removed = numbers.remove(0);
             for _ in 0..24 {
-                sums = sums
-                    .into_iter()
-                    .filter(|sum| sum.numbers.0 != removed && sum.numbers.1 != removed)
-                    .collect();
+                sums.retain(|sum| sum.numbers.0 != removed && sum.numbers.1 != removed);
             }
             sums.append(
                 numbers

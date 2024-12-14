@@ -14,7 +14,7 @@ fn main() -> std::io::Result<()> {
 
     for l in buf.lines() {
         let line = l.unwrap();
-        if line == "" {
+        if line.is_empty() {
             sum1 += answers.len();
             answers.clear();
 
@@ -22,7 +22,7 @@ fn main() -> std::io::Result<()> {
             for hs in group_answers.iter() {
                 let tmp = ans.clone();
                 ans.clear();
-                for c in tmp.intersection(&*hs) {
+                for c in tmp.intersection(hs) {
                     ans.insert(*c);
                 }
             }

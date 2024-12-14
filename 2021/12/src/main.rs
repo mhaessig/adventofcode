@@ -8,35 +8,34 @@ enum Cave<'a> {
     Small(&'a str),
 }
 
-
 impl<'a> Cave<'a> {
     fn new(s: &'a str) -> Self {
         if s.chars()
-            .fold(true, |is_upper, c| is_upper && c.is_ascii_uppercase())
+            .all(|c| c.is_ascii_uppercase())
         {
             Self::Big(s)
         } else if s
             .chars()
-            .fold(true, |is_lower, c| is_lower && c.is_ascii_lowercase())
+            .all(|c| c.is_ascii_lowercase())
         {
             Self::Small(s)
         } else {
             unreachable!("all input needs to be all uppercase or lowercase");
         }
     }
-    
+
     fn is_small(self) -> bool {
         match self {
             Self::Small(_) => true,
-            Self::Big(_) => false
+            Self::Big(_) => false,
         }
     }
 }
 
 fn main() {
     let edges: Vec<(Cave, Cave)> = include_str!("../input.txt")
-    //let edges: Vec<(Cave, Cave)> = include_str!("../example_input2.txt")
-    //let edges: Vec<(Cave, Cave)> = include_str!("../example_input1.txt")
+        //let edges: Vec<(Cave, Cave)> = include_str!("../example_input2.txt")
+        //let edges: Vec<(Cave, Cave)> = include_str!("../example_input1.txt")
         .lines()
         .map(|s| s.split_once('-').unwrap())
         .map(|(n1, n2)| (Cave::new(n1), Cave::new(n2)))
@@ -70,8 +69,8 @@ fn build_path(
     n: NodeIndex,
     end: NodeIndex,
     visited_one_small_cave_twice: bool,
-    cant_visit: &Vec<Cave>,
-    visited: &Vec<Cave>,
+    cant_visit: &[Cave],
+    visited: &[Cave],
 ) -> usize {
     if n == end {
         //println!("{:?}", visited);
@@ -79,16 +78,18 @@ fn build_path(
     }
 
     let nw = *g.node_weight(n).unwrap();
-    let mut cant_visit = cant_visit.clone();
-    let mut visited = visited.clone();
+    let mut cant_visit = cant_visit.to_owned();
+    let mut visited = visited.to_owned();
 
     let visited_one_small_cave_twice = if visited.contains(&nw) && nw.is_small() {
-        visited.iter().for_each(|c| if c.is_small() {
-            cant_visit.push(*c);
+        visited.iter().for_each(|c| {
+            if c.is_small() {
+                cant_visit.push(*c);
+            }
         });
-        true || visited_one_small_cave_twice
+        true
     } else {
-        false || visited_one_small_cave_twice
+        visited_one_small_cave_twice
     };
 
     visited.push(nw);
@@ -105,6 +106,14 @@ fn build_path(
         .collect::<Vec<_>>();
 
     visit.into_iter().fold(0, |count, i| {
-        count + build_path(g, i, end, visited_one_small_cave_twice, &cant_visit, &visited)
+        count
+            + build_path(
+                g,
+                i,
+                end,
+                visited_one_small_cave_twice,
+                &cant_visit,
+                &visited,
+            )
     })
 }

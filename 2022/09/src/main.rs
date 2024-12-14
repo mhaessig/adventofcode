@@ -3,7 +3,6 @@ use std::{
     error::Error,
     fs::File,
     io::{BufRead, BufReader},
-    ops::Add,
     str::FromStr,
 };
 
@@ -20,8 +19,7 @@ impl FromStr for Move {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let parts = s.split_whitespace().collect::<Vec<_>>();
         let n = parts[1]
-            .parse::<i64>()
-            .or_else(|_| Err("expected a number"))?;
+            .parse::<i64>().map_err(|_| "expected a number")?;
         match parts[0] {
             "L" => Ok(Self::Left(n)),
             "R" => Ok(Self::Right(n)),
@@ -66,7 +64,7 @@ fn move_tail(h: (i64, i64), t: (i64, i64)) -> (i64, i64) {
         unreachable!();
     }
 
-    return (t.0 + diff.0, t.1 + diff.1);
+    (t.0 + diff.0, t.1 + diff.1)
 }
 
 fn main() -> Result<(), Box<dyn Error>> {

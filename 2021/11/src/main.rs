@@ -63,9 +63,9 @@ fn add_octos_truncated(o1: &Octos, o2: &Octos) -> Octos {
 
 fn step(o: &mut Octos) -> u32 {
     // first, increase energy of every octopus by one
-    for i in 0..10 {
-        for j in 0..10 {
-            o[i][j] += 1;
+    for octos in o.iter_mut() {
+        for octo in octos.iter_mut() {
+            *octo += 1;
         }
     }
 
@@ -75,9 +75,9 @@ fn step(o: &mut Octos) -> u32 {
         sth_changed = false;
         let mut changes = Octos::default();
 
-        for i in 0..10 {
-            for j in 0..10 {
-                if o[i][j] == 10 {
+        for (i, octos) in o.iter_mut().enumerate() {
+            for (j, octo) in octos.iter_mut().enumerate() {
+                if *octo == 10 {
                     changes = add_octos(&changes, &do_flash(i, j));
                     sth_changed = true;
                 }
@@ -92,10 +92,10 @@ fn step(o: &mut Octos) -> u32 {
     // count the flashes (energies > 9, because an octopus can only flash once per step)
     // all energies > 9 must be set to 0
     let mut flashes = 0;
-    for i in 0..10 {
-        for j in 0..10 {
-            if o[i][j] > 9 {
-                o[i][j] = 0;
+    for os in o.iter_mut() {
+        for octo in os.iter_mut() {
+            if *octo > 9 {
+                *octo = 0;
                 flashes += 1;
             }
         }
@@ -124,9 +124,8 @@ fn main() {
         flashes += new_flashes;
 
         if new_flashes == 100 {
-            dbg!(i+1);
+            dbg!(i + 1);
             break;
         }
     }
-
 }

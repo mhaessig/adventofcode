@@ -40,15 +40,12 @@ impl Bag {
                 context("case contains bags", map(separated_list1(terminated(tag(","), space1),
                     context("bag list item", terminated(
                         pair(map_res(terminated(digit1, space1), |s: &str| s.parse::<i32>()), bag_description), alt((tag("bags"), tag("bag")))
-                    ))), |x| Some(x)))
+                    ))), Some))
                 )),
             context("full stop at end of rule", tag("."))
         ))(i)?;
 
-        let contents = match content {
-            None => None,
-            Some(v) => Some(make_contents(v))
-        };
+        let contents = content.map(make_contents);
 
         let bag = Self {desc, contents};
 
@@ -101,7 +98,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             Some(b) => {
                 for k in b.keys() {
                     match contained_in.get_mut(k.as_str()) {
-                        None => {contained_in.insert(k.as_str(), Vec::from([bag.desc.as_str()])); ()},
+                        None => {contained_in.insert(k.as_str(), Vec::from([bag.desc.as_str()])); },
                         Some(v) => v.push(&*bag.desc)
                     }
                 }
@@ -131,7 +128,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             bools.push(shiny.insert(b));
         }
 
-        new = bools.iter().fold(false, |aggr, val| aggr || *val);
+        new = bools.iter().any(|val| *val);
     }
 
     println!("Part 1: number of bags able to contain shiny gold bag: {}", shiny.len());

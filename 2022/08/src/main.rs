@@ -99,17 +99,17 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
 
             let mut down = 0;
-            for a in y+1..width {
+            for trees in forest.iter().take(width).skip(y+1) {
                 down += 1;
-                if forest[a][x] >= size {
+                if trees[x] >= size {
                     break;
                 }
             }
 
             let mut left = 0;
-            for a in (0..x).rev() {
+            for tree in forest[y].iter().take(x).rev() {
                 left += 1;
-                if forest[y][a] >= size {
+                if *tree >= size {
                     break;
                 }
             }

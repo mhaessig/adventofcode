@@ -13,7 +13,7 @@ fn main() {
     let mut instrs: Vec<Fold> = Vec::new();
     let mut empty_line = false;
     for l in lines {
-        if l == "" {
+        if l.is_empty() {
             empty_line = true;
             continue;
         }

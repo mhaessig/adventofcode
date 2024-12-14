@@ -1,10 +1,7 @@
 use std::{
     collections::{BTreeSet, HashMap},
     error::Error,
-    fs::{read_to_string, File},
-    hash::Hash,
-    io::{BufReader, Read},
-    ops::Div,
+    fs::read_to_string,
 };
 
 use nom::{
@@ -22,11 +19,11 @@ struct Page {
 }
 
 impl Page {
-    pub fn new(number: u8, update_before: &Vec<u8>, update_after: &Vec<u8>) -> Self {
+    pub fn new(number: u8, update_before: &[u8], update_after: &[u8]) -> Self {
         Page {
             number,
-            update_before: update_before.clone(),
-            update_after: update_after.clone(),
+            update_before: update_before.to_owned(),
+            update_after: update_after.to_owned(),
         }
     }
 }
@@ -34,10 +31,6 @@ impl Page {
 impl PartialEq for Page {
     fn eq(&self, other: &Self) -> bool {
         self.number == other.number
-    }
-
-    fn ne(&self, other: &Self) -> bool {
-        self.number != other.number
     }
 }
 
@@ -52,7 +45,7 @@ impl PartialOrd for Page {
 impl Ord for Page {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         if self == other {
-            return std::cmp::Ordering::Equal;
+            std::cmp::Ordering::Equal
         } else if self.update_before.contains(&other.number) {
             std::cmp::Ordering::Less
         } else if self.update_after.contains(&other.number) {
@@ -63,7 +56,10 @@ impl Ord for Page {
     }
 }
 
-fn parse(s: &str) -> IResult<&str, (Vec<(u8, u8)>, Vec<Vec<u8>>)> {
+type Relations = Vec<(u8, u8)>;
+type Updates = Vec<Vec<u8>>;
+
+fn parse(s: &str) -> IResult<&str, (Relations, Updates)> {
     let relation = terminated(separated_pair(u8, char('|'), u8), line_ending);
     let print = terminated(separated_list1(char(','), u8), line_ending);
     separated_pair(many1(relation), line_ending, many1(print)).parse(s)
@@ -73,7 +69,7 @@ fn solution(input: String) -> Result<(u64, u64), Box<dyn Error>> {
     let Ok((residual, (relations, updates))) = parse(&input) else {
         return Err("Failed to parse input".into());
     };
-    if residual != "" {
+    if !residual.is_empty() {
         return Err(format!("Failed to parse input completely. Residual: {residual}").into());
     }
 

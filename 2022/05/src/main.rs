@@ -32,22 +32,17 @@ fn main() -> Result<(), Box<dyn Error>> {
             } else {
                 instruction_desc = format!("{}\n{}", instruction_desc, line);
             }
+        } else if stack_desc.is_empty() {
+            stack_desc = line;
         } else {
-            if stack_desc.is_empty() {
-                stack_desc = line;
-            } else {
-                stack_desc = format!("{}\n{}", stack_desc, line);
-            }
+            stack_desc = format!("{}\n{}", stack_desc, line);
         }
     }
 
     let num_stacks = format!(
         "{}",
         stack_desc
-            .split('\n')
-            .into_iter()
-            .rev()
-            .nth(0)
+            .split('\n').next_back()
             .unwrap()
             .chars()
             .filter(|c| c.is_ascii_digit())
