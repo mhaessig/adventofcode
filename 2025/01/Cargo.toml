@@ -1,0 +1,11 @@
+[package]
+name = "aoc25-01"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+libaoc = { path = "../../libaoc" }
+regex = "1.12.2"
+
+[lints]
+workspace = true
